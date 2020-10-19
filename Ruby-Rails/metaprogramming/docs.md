@@ -75,6 +75,7 @@ bill_mfv.hi
 ## Open to Change (Monkey patching)
 You re-open any class and change it’s methods. You can add methods to classes, remove them or redefine them.
 ```ruby
+# Example 5:
 class String
   # Simple method splits a sentence into an Array of words
   def words
@@ -87,6 +88,7 @@ end
 ```
 
 ```ruby
+# Example 6:
 class Integer
   alias_method :old_add, :+
 
@@ -101,6 +103,7 @@ end
 ```
 
 ```ruby
+# Example 7:
 class Bill
   def hi
     "Hi! I'm Bill."
@@ -135,4 +138,21 @@ bill_mfj = BillMfj.new
 bill_mfj.hi #=> "Hi! I'm Bill."
 ```
 
+Noted:
+- `undef_method` will make the method becomes not defined -> will raise `NoMethodError` if we call this method.
+- `remove_method` will remove the method only in the class, but doesn't remove the method in parent classes.
+
 ## Writing Code That Writes Code
+Writing code that is the same (or similar) several times -> waste of time and maybe hard to make changes in future
+=> Don't Repeat Yourself (DRY)
+It’s possible to remove this duplication of effort by writing code that writes the code for you.
+`define_method`
+```ruby
+# Example 8:
+
+```
+
+
+## send
+## method_missing
+
