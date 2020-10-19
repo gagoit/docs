@@ -107,16 +107,32 @@ class Bill
   end
 end
 
-bill_1 = Bill.new
+class BillMfv < Bill
+  def hi
+    "Hi! I'm Bill from MFV."
+  end
+end
 
-class Bill
+class BillMfj < Bill
+  def hi
+    "Hi! I'm Bill from MFJ."
+  end
+end
+
+class BillMfv
+  undef_method :hi
+end
+
+
+class BillMfj
   remove_method :hi
 end
 
-bill_2 = Bill.new
+bill_mfv = BillMfv.new
+bill_mfv.hi #=> NoMethodError
 
-bill_1.hi #=> NoMethodError
-bill_2.hi #=> NoMethodError
+bill_mfj = BillMfj.new
+bill_mfj.hi #=> "Hi! I'm Bill."
 ```
 
 ## Writing Code That Writes Code
