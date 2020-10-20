@@ -230,8 +230,43 @@ str_presenter.gsub("'m", " am")
 # But when we call the method respond_to? to check a method is in the object or not.
 str_presenter.respond_to?(:upcase)
   # => false
+
+# method: Looks up the named method as a receiver in obj, returning a Method object (or raising NameError)
+str_presenter.method(:upcase)
+  # => NameError: undefined method `upcase' for class `Presenter'
+
+class Presenter
+  attr_accessor :object
+
+  def initialize object
+    @object = object
+  end
+
+  # If a method we call is missing, pass the call onto the object we delegate to.
+  def method_missing method_name, *args, &block
+    if object.respond_to?(method_name)
+      puts "Delegating #{method_name}"
+      object.send(method_name, *args, &block)
+    else
+      super
+    end
+  end
+  
+  def respond_to_missing?(method_name, include_private = false)
+    object.respond_to?(method_name) || super
+  end
+end
+
+str_presenter.respond_to?(:upcase)
+  # => false
+
+str_presenter.method(:upcase)
+  # => #<Method: Presenter#upcase>
 ```
+
+Always define `respond_to_missing?` when overriding `method_missing`.
 
 
 https://www.leighhalliday.com/ruby-metaprogramming-method-missing
+
 https://thoughtbot.com/blog/always-define-respond-to-missing-when-overriding
