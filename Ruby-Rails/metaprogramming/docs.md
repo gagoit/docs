@@ -144,15 +144,94 @@ Noted:
 
 ## Writing Code That Writes Code
 Writing code that is the same (or similar) several times -> waste of time and maybe hard to make changes in future
+
 => Don't Repeat Yourself (DRY)
+
 It’s possible to remove this duplication of effort by writing code that writes the code for you.
 `define_method`
 ```ruby
 # Example 8:
 
+# Normal
+class RestApi
+  def perform_get path
+    "You are perform GET " + path
+  end
+  
+  def perform_post path
+    "You are perform POST " + path
+  end
+  
+  def perform_delete path
+    "You are perform DELETE " + path
+  end
+end
+
+# Using define_method
+class RestApi
+  ACTIONS = [:post, :get, :delete]
+
+  ACTIONS.each do |action|
+    define_method("perform_#{action}") do |path|
+      "You are perform #{action.to_s.upcase} " + path
+    end
+  end
+end
+
+api = RestApi.new
+api.perform_get("/api/users/1") #=> "You are perform GET /api/users/1"
+
+api.perform_post("/api/users/1") #=> "You are perform POST /api/users/1"
 ```
 
 
 ## send
-## method_missing
+```ruby
+def relay(array, data_type)
+  array.map{|e| e.send("to_#{data_type}")}
+end
 
+relay([1,3,4], "s")
+```
+## method_missing
+```ruby
+def method_missing(method_name, *args, &block)
+end
+```
+
+```ruby
+class Presenter
+  attr_accessor :object
+
+  def initialize object
+    @object = object
+  end
+
+  # If a method we call is missing, pass the call onto the object we delegate to.
+  def method_missing method_name, *args, &block
+    puts "Delegating #{method_name}"
+    object.send(method_name, *args, &block)
+  end
+end
+
+str_presenter = Presenter.new("I'm Bill.")
+str_presenter.to_i
+  # Delegating to_i
+  # => 0
+
+str_presenter.upcase
+  # Delegating upcase
+  # => "I'M BILL."
+
+str_presenter.gsub("'m", " am")
+  # Delegating gsub
+  # => "I am Bill."
+
+# But when we call the method respond_to? to check a method is in the object or not.
+str_presenter.respond_to?(:upcase)
+  # => false
+```
+
+
+https://www.leighhalliday.com/ruby-metaprogramming-method-missing
+https://thoughtbot.com/blog/always-define-respond-to-missing-when-overriding
